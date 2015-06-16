@@ -61,17 +61,25 @@ var mapBoundary = [
     new Vertex(500, 500),
     new Vertex(0, 500)
 ];
-var objects = [new Box(10, 10, 80, 80), character];
+var objects = [new Box(50, 50, 80, 80), character];
 var objectEdges = objects
     .map(function (box) { return box.vertices(); })
     .filter(function (val) { return val.length != 0; });
 function almost(x, y) {
     return Math.abs(x - y) < .0001;
 }
-function drawLine(start, end, color) {
+function drawLine(start, end, color, dashed) {
     if (color === void 0) { color = "$000"; }
+    if (dashed === void 0) { dashed = false; }
     context.strokeStyle = color;
     context.beginPath();
+    if (dashed) {
+        // Dashed lines don't work in IE<11?? All my hopes are dashed! (TODO)
+        context.setLineDash([2, 3]);
+    }
+    else {
+        context.setLineDash([]);
+    }
     context.moveTo(start.x, start.y);
     context.lineTo(end.x, end.y);
     context.stroke();
@@ -172,8 +180,17 @@ function drawLOSRays() {
     }
     for (var _c = 0; _c < allVertices.length; _c++) {
         var vertex = allVertices[_c];
-        var end = raycast(origin, vertex, true);
-        drawLine(origin, end, "gray");
+        var raycastEnd = raycast(origin, vertex, true);
+        if (origin.dist2(raycastEnd) < origin.dist2(vertex)) {
+            continue;
+        }
+        if (raycastEnd.eq(vertex)) {
+            drawLine(origin, raycastEnd, "gray");
+        }
+        else {
+            drawLine(origin, vertex, "gray");
+            drawLine(vertex, raycastEnd, "gray", true);
+        }
     }
 }
 document.addEventListener("DOMContentLoaded", function (event) {
