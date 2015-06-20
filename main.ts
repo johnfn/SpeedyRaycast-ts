@@ -4,7 +4,7 @@
   var canvas: HTMLCanvasElement;
   var context: CanvasRenderingContext2D;
 
-  var character: Box = new Box(200, 200, 30, 30, true);
+  var character: Box = new Box(300, 300, 30, 30, true);
 
   var mapBoundary: Vertex[] = [
     new Vertex(0, 0),
@@ -13,7 +13,7 @@
     new Vertex(0, 500)
   ];
 
-  var objects: Box[] = [new Box(50, 50, 80, 80), character];
+  var objects: Box[] = [new Box(150, 150, 80, 80), character];
 
   function objectEdges(): Vertex[][] {
     return objects
@@ -103,7 +103,6 @@
     for (var vertex of mapBoundary) {
       allVertices.push(vertex);
     }
-
     for (var vertex of allVertices) {
       var raycastEnd = raycast(origin, vertex, objects, true);
 

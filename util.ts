@@ -23,9 +23,9 @@ class Vertex {
       (this.y - other.y) * (this.y - other.y);
   }
 
-  draw(): void {
+  draw(size: number = 5): void {
     context.beginPath();
-    context.arc(this.x, this.y, 5, 0, 2 * Math.PI, false);
+    context.arc(this.x, this.y, size, 0, 2 * Math.PI, false);
     context.fillStyle = 'blue';
     context.fill();
   }
@@ -66,8 +66,12 @@ class Box {
   contains(v: Vertex, checkForPlayerToo: boolean = false) {
     if (this.isPlayer && !checkForPlayerToo) return false;
 
-    return v.x > this.x && v.x < this.x + this.width &&
-           v.y > this.y && v.y < this.y + this.height;
+    if (this.isPlayer) {
+      return Math.sqrt(v.dist2(this.center())) < this.width;
+    } else {
+      return v.x > this.x && v.x < this.x + this.width &&
+             v.y > this.y && v.y < this.y + this.height;
+    }
   }
 
   draw(context: CanvasRenderingContext2D): void {

@@ -2,14 +2,14 @@
 (function () {
     var canvas;
     var context;
-    var character = new Box(200, 200, 30, 30, true);
+    var character = new Box(300, 300, 30, 30, true);
     var mapBoundary = [
         new Vertex(0, 0),
         new Vertex(500, 0),
         new Vertex(500, 500),
         new Vertex(0, 500)
     ];
-    var objects = [new Box(50, 50, 80, 80), character];
+    var objects = [new Box(150, 150, 80, 80), character];
     function objectEdges() {
         return objects
             .map(function (box) { return box.vertices(); })

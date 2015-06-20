@@ -19,9 +19,10 @@ var Vertex = (function () {
         return (this.x - other.x) * (this.x - other.x) +
             (this.y - other.y) * (this.y - other.y);
     };
-    Vertex.prototype.draw = function () {
+    Vertex.prototype.draw = function (size) {
+        if (size === void 0) { size = 5; }
         context.beginPath();
-        context.arc(this.x, this.y, 5, 0, 2 * Math.PI, false);
+        context.arc(this.x, this.y, size, 0, 2 * Math.PI, false);
         context.fillStyle = 'blue';
         context.fill();
     };
@@ -59,8 +60,13 @@ var Box = (function () {
         if (checkForPlayerToo === void 0) { checkForPlayerToo = false; }
         if (this.isPlayer && !checkForPlayerToo)
             return false;
-        return v.x > this.x && v.x < this.x + this.width &&
-            v.y > this.y && v.y < this.y + this.height;
+        if (this.isPlayer) {
+            return Math.sqrt(v.dist2(this.center())) < this.width;
+        }
+        else {
+            return v.x > this.x && v.x < this.x + this.width &&
+                v.y > this.y && v.y < this.y + this.height;
+        }
     };
     Box.prototype.draw = function (context) {
         if (this.isPlayer) {

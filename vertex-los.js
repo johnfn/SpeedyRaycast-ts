@@ -1,3 +1,7 @@
+// TODO
+// * Highlight doubled-up vertexes with different color.
+// * Vertex popping animations?
+// * Don't drag character onto box?
 var canvas;
 var context;
 var character = new Box(50, 50, 25, 25, true);
@@ -5,7 +9,8 @@ var objects = [
     new Box(250, 250, 50, 50),
     new Box(100, 100, 50, 50),
     new Box(100, 250, 50, 50),
-    character];
+    character
+];
 function objsWithoutCharacter() {
     return objects.filter(function (val) { return val != character; });
 }
@@ -25,6 +30,7 @@ function renderScene() {
 }
 function drawRays() {
     var lineOrigin = character.center();
+    var visibleVertices = [];
     for (var _i = 0; _i < objects.length; _i++) {
         var box = objects[_i];
         if (box == character)
@@ -35,11 +41,18 @@ function drawRays() {
             if (lineOrigin.eq(vertex))
                 continue;
             var lineEnd = raycast(lineOrigin, vertex, objsWithoutCharacter(), true);
-            if (lineOrigin.dist2(lineEnd) >= lineOrigin.dist2(vertex)) {
-                drawLine(context, lineOrigin, lineEnd, "red");
-                vertex.draw();
+            if (lineOrigin.dist2(lineEnd) == lineOrigin.dist2(vertex)) {
+                visibleVertices.push(vertex);
+            }
+            if (lineOrigin.dist2(lineEnd) > lineOrigin.dist2(vertex)) {
+                visibleVertices.push(lineEnd);
             }
         }
+    }
+    for (var _b = 0; _b < visibleVertices.length; _b++) {
+        var vertex = visibleVertices[_b];
+        drawLine(context, lineOrigin, vertex, "red");
+        vertex.draw();
     }
 }
 function setUpListeners() {
@@ -55,8 +68,14 @@ function setUpListeners() {
     });
     canvas.addEventListener("mousemove", function (ev) {
         if (selectedThing != null && !outOfBounds(new Vertex(ev.offsetX, ev.offsetY))) {
-            selectedThing.x = Math.floor(ev.offsetX / CELL_W) * CELL_W;
-            selectedThing.y = Math.floor(ev.offsetY / CELL_H) * CELL_H;
+            if (selectedThing.isPlayer) {
+                selectedThing.x = Math.round(ev.offsetX / CELL_W) * CELL_W;
+                selectedThing.y = Math.round(ev.offsetY / CELL_H) * CELL_H;
+            }
+            else {
+                selectedThing.x = Math.floor(ev.offsetX / CELL_W) * CELL_W;
+                selectedThing.y = Math.floor(ev.offsetY / CELL_H) * CELL_H;
+            }
         }
     });
     canvas.addEventListener("mouseup", function (ev) {
