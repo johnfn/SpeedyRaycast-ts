@@ -19,12 +19,27 @@ var Vertex = (function () {
         return (this.x - other.x) * (this.x - other.x) +
             (this.y - other.y) * (this.y - other.y);
     };
-    Vertex.prototype.draw = function (size) {
+    Vertex.prototype.draw = function (color, size) {
+        if (color === void 0) { color = "blue"; }
         if (size === void 0) { size = 5; }
         context.beginPath();
         context.arc(this.x, this.y, size, 0, 2 * Math.PI, false);
-        context.fillStyle = 'blue';
+        context.fillStyle = color;
         context.fill();
+    };
+    Vertex.prototype.isOnSegment = function (start, end) {
+        return this.isOnLine(start, end) &&
+            isWithinRange(this.x, start.x, end.x) &&
+            isWithinRange(this.y, start.y, end.y);
+    };
+    Vertex.prototype.isOnLine = function (start, end) {
+        // Special case for vertical lines (which have an undefined slope).
+        if (Math.abs(end.x - start.x) < .001) {
+            return almost(this.x, start.x);
+        }
+        var m = (end.y - start.y) / (end.x - start.x);
+        var b = start.y - m * start.x;
+        return almost(this.y, m * this.x + b);
     };
     return Vertex;
 })();
@@ -98,6 +113,11 @@ function outOfBounds(v) {
 // Does x almost equal y?
 function almost(x, y) {
     return Math.abs(x - y) < .0001;
+}
+function isWithinRange(value, start, end) {
+    var low = Math.min(start, end);
+    var high = Math.max(start, end);
+    return value >= low && value <= high;
 }
 // Raycast from start in the direction of secondPoint. If keepGoing, then continue past
 // that point, if possible. Stop if we collide with anything in colliders.

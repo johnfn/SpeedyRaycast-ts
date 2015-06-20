@@ -23,11 +23,29 @@ class Vertex {
       (this.y - other.y) * (this.y - other.y);
   }
 
-  draw(size: number = 5): void {
+  draw(color: string = "blue", size: number = 5): void {
     context.beginPath();
     context.arc(this.x, this.y, size, 0, 2 * Math.PI, false);
-    context.fillStyle = 'blue';
+    context.fillStyle = color;
     context.fill();
+  }
+
+  isOnSegment(start: Vertex, end: Vertex): boolean {
+    return this.isOnLine(start, end) &&
+      isWithinRange(this.x, start.x, end.x) && // The point is within the segment.
+      isWithinRange(this.y, start.y, end.y);
+  }
+
+  isOnLine(start: Vertex, end: Vertex): boolean {
+    // Special case for vertical lines (which have an undefined slope).
+    if (Math.abs(end.x - start.x) < .001) {
+      return almost(this.x, start.x);
+    }
+
+    var m = (end.y - start.y) / (end.x - start.x);
+    var b = start.y - m * start.x;
+
+    return almost(this.y, m * this.x + b);
   }
 }
 
@@ -110,6 +128,13 @@ function outOfBounds(v: Vertex): boolean {
 // Does x almost equal y?
 function almost(x: number, y: number) {
   return Math.abs(x - y) < .0001;
+}
+
+function isWithinRange(value: number, start: number, end: number) {
+  var low = Math.min(start, end);
+  var high = Math.max(start, end);
+
+  return value >= low && value <= high;
 }
 
 // Raycast from start in the direction of secondPoint. If keepGoing, then continue past

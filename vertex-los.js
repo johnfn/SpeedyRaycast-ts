@@ -14,6 +14,15 @@ var objects = [
 function objsWithoutCharacter() {
     return objects.filter(function (val) { return val != character; });
 }
+function allVertices() {
+    var allObjs = objsWithoutCharacter();
+    var result = [];
+    for (var _i = 0; _i < allObjs.length; _i++) {
+        var obj = allObjs[_i];
+        result = result.concat(obj.vertices());
+    }
+    return result;
+}
 function start() {
     canvas = document.getElementById("main");
     context = canvas.getContext('2d');
@@ -22,7 +31,7 @@ function start() {
     requestAnimationFrame(renderScene);
 }
 function renderScene() {
-    context.clearRect(-1, -1, CANV_W, CANV_H);
+    context.clearRect(-1, -1, CANV_W + 1, CANV_H + 1);
     drawGrid();
     drawRays();
     drawObjects();
@@ -30,7 +39,8 @@ function renderScene() {
 }
 function drawRays() {
     var lineOrigin = character.center();
-    var visibleVertices = [];
+    var lineEndpoints = [];
+    var verts = allVertices();
     for (var _i = 0; _i < objects.length; _i++) {
         var box = objects[_i];
         if (box == character)
@@ -42,17 +52,26 @@ function drawRays() {
                 continue;
             var lineEnd = raycast(lineOrigin, vertex, objsWithoutCharacter(), true);
             if (lineOrigin.dist2(lineEnd) == lineOrigin.dist2(vertex)) {
-                visibleVertices.push(vertex);
+                lineEndpoints.push(vertex);
             }
             if (lineOrigin.dist2(lineEnd) > lineOrigin.dist2(vertex)) {
-                visibleVertices.push(lineEnd);
+                lineEndpoints.push(lineEnd);
             }
         }
     }
-    for (var _b = 0; _b < visibleVertices.length; _b++) {
-        var vertex = visibleVertices[_b];
-        drawLine(context, lineOrigin, vertex, "red");
-        vertex.draw();
+    for (var _b = 0; _b < lineEndpoints.length; _b++) {
+        var endpoint = lineEndpoints[_b];
+        drawLine(context, lineOrigin, endpoint, "red");
+        var verticesOnLine = verts.filter(function (vert) { return vert.isOnSegment(lineOrigin, endpoint); });
+        for (var _c = 0; _c < verticesOnLine.length; _c++) {
+            var vertex = verticesOnLine[_c];
+            if (verticesOnLine.length > 1) {
+                vertex.draw("red");
+            }
+            else {
+                vertex.draw();
+            }
+        }
     }
 }
 function setUpListeners() {

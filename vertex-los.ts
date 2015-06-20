@@ -18,6 +18,17 @@ function objsWithoutCharacter() {
   return objects.filter(val => val != character);
 }
 
+function allVertices(): Vertex[] {
+  var allObjs = objsWithoutCharacter();
+  var result: Vertex[] = [];
+
+  for (var obj of allObjs) {
+    result = result.concat(obj.vertices());
+  }
+
+  return result;
+}
+
 function start() {
   canvas = <HTMLCanvasElement> document.getElementById("main");
   context = <CanvasRenderingContext2D> canvas.getContext('2d');
@@ -30,7 +41,7 @@ function start() {
 }
 
 function renderScene() {
-  context.clearRect(-1, -1, CANV_W, CANV_H);
+  context.clearRect(-1, -1, CANV_W + 1, CANV_H + 1);
 
   drawGrid();
   drawRays();
@@ -41,7 +52,8 @@ function renderScene() {
 
 function drawRays() {
   var lineOrigin = character.center();
-  var visibleVertices: Vertex[] = [];
+  var lineEndpoints: Vertex[] = [];
+  var verts: Vertex[] = allVertices();
 
   for (var box of objects) {
     if (box == character) continue;
@@ -54,19 +66,27 @@ function drawRays() {
       var lineEnd = raycast(lineOrigin, vertex, objsWithoutCharacter(), true);
 
       if (lineOrigin.dist2(lineEnd) == lineOrigin.dist2(vertex)) {
-        visibleVertices.push(vertex);
+        lineEndpoints.push(vertex);
       }
 
       if (lineOrigin.dist2(lineEnd) > lineOrigin.dist2(vertex)) {
-        visibleVertices.push(lineEnd);
+        lineEndpoints.push(lineEnd);
       }
     }
   }
 
-  for (var vertex of visibleVertices) {
-    drawLine(context, lineOrigin, vertex, "red");
+  for (var endpoint of lineEndpoints) {
+    drawLine(context, lineOrigin, endpoint, "red");
 
-    vertex.draw();
+    var verticesOnLine = verts.filter(vert => vert.isOnSegment(lineOrigin, endpoint));
+
+    for (var vertex of verticesOnLine) {
+      if (verticesOnLine.length > 1) {
+        vertex.draw("red");
+      } else {
+        vertex.draw();
+      }
+    }
   }
 }
 
