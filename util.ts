@@ -23,7 +23,7 @@ class Vertex {
       (this.y - other.y) * (this.y - other.y);
   }
 
-  draw(color: string = "blue", size: number = 5): void {
+  draw(context: CanvasRenderingContext2D, color: string = "blue", size: number = 5): void {
     context.beginPath();
     context.arc(this.x, this.y, size, 0, 2 * Math.PI, false);
     context.fillStyle = color;

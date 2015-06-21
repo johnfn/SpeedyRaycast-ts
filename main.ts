@@ -103,6 +103,7 @@
     for (var vertex of mapBoundary) {
       allVertices.push(vertex);
     }
+
     for (var vertex of allVertices) {
       var raycastEnd = raycast(origin, vertex, objects, true);
 
@@ -112,9 +113,14 @@
 
       if (raycastEnd.eq(vertex)) {
         drawLine(context, origin, raycastEnd, "gray");
+
+        raycastEnd.draw(context);
       } else {
         drawLine(context, origin, vertex, "gray");
         drawLine(context, vertex, raycastEnd, "gray", true);
+
+        vertex.draw(context);
+        raycastEnd.draw(context);
       }
     }
   }

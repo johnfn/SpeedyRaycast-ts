@@ -32,7 +32,7 @@ var Vertex = (function () {
         return (this.x - other.x) * (this.x - other.x) +
             (this.y - other.y) * (this.y - other.y);
     };
-    Vertex.prototype.draw = function (color, size) {
+    Vertex.prototype.draw = function (context, color, size) {
         if (color === void 0) { color = "blue"; }
         if (size === void 0) { size = 5; }
         context.beginPath();

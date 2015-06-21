@@ -279,4 +279,3 @@ class Ambrosia {
     this.listenToHelper(target, eventName, callback, true);
   }
 }
-}
