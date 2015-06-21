@@ -5,14 +5,23 @@
 
 var canvas: HTMLCanvasElement;
 var context: CanvasRenderingContext2D;
+var ticksSinceChange: number = 0;
 
 var character: Box = new Box(50, 50, 25, 25, true);
 var objects: Box[] = [
-  new Box(250, 250, 50, 50),
-  new Box(100, 100, 50, 50),
-  new Box(100, 250, 50, 50),
+  new Box(250, 250, 50, 50, false),
+  new Box(100, 100, 50, 50, false),
+  new Box(100, 250, 50, 50, false),
   character
 ];
+
+for (var box of objects) {
+  box.listenTo(box, "change-different", change);
+}
+
+function change() {
+  ticksSinceChange = 0;
+}
 
 function objsWithoutCharacter() {
   return objects.filter(val => val != character);
@@ -48,6 +57,8 @@ function renderScene() {
   drawObjects();
 
   requestAnimationFrame(renderScene);
+
+  ++ticksSinceChange;
 }
 
 function drawRays() {
@@ -76,13 +87,13 @@ function drawRays() {
   }
 
   for (var endpoint of lineEndpoints) {
-    drawLine(context, lineOrigin, endpoint, "red");
-
     var verticesOnLine = verts.filter(vert => vert.isOnSegment(lineOrigin, endpoint));
+
+    drawLine(context, lineOrigin, endpoint, "red");
 
     for (var vertex of verticesOnLine) {
       if (verticesOnLine.length > 1) {
-        vertex.draw("red");
+        vertex.draw("red", 10 - Math.min(ticksSinceChange * ticksSinceChange / 10, 5));
       } else {
         vertex.draw();
       }

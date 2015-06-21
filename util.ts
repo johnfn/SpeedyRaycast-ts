@@ -49,14 +49,23 @@ class Vertex {
   }
 }
 
-class Box {
+class Box extends Ambrosia {
+  @prop x: number;
+  @prop y: number;
+
   constructor(
-    public x: number,
-    public y: number,
+    x: number,
+    y: number,
     public width: number,
     public height: number,
-    public isPlayer: boolean = false
-    ) {}
+    public isPlayer: boolean = false,
+    public changecb: () => void = undefined
+    ) {
+    super();
+
+    this.x = x;
+    this.y = y;
+  }
 
   vertices() {
     // don't judge me

@@ -1,4 +1,18 @@
 /// <reference path="defs.d.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+if (typeof __decorate !== "function") __decorate = function (decorators, target, key, desc) {
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") return Reflect.decorate(decorators, target, key, desc);
+    switch (arguments.length) {
+        case 2: return decorators.reduceRight(function(o, d) { return (d && d(o)) || o; }, target);
+        case 3: return decorators.reduceRight(function(o, d) { return (d && d(target, key)), void 0; }, void 0);
+        case 4: return decorators.reduceRight(function(o, d) { return (d && d(target, key, o)) || o; }, desc);
+    }
+};
 var CANV_W = 500;
 var CANV_H = 500;
 var CELL_W = 50;
@@ -14,7 +28,6 @@ var Vertex = (function () {
     Vertex.prototype.clone = function () {
         return new Vertex(this.x, this.y);
     };
-    // distance^2 to other
     Vertex.prototype.dist2 = function (other) {
         return (this.x - other.x) * (this.x - other.x) +
             (this.y - other.y) * (this.y - other.y);
@@ -33,7 +46,6 @@ var Vertex = (function () {
             isWithinRange(this.y, start.y, end.y);
     };
     Vertex.prototype.isOnLine = function (start, end) {
-        // Special case for vertical lines (which have an undefined slope).
         if (Math.abs(end.x - start.x) < .001) {
             return almost(this.x, start.x);
         }
@@ -43,14 +55,18 @@ var Vertex = (function () {
     };
     return Vertex;
 })();
-var Box = (function () {
-    function Box(x, y, width, height, isPlayer) {
+var Box = (function (_super) {
+    __extends(Box, _super);
+    function Box(x, y, width, height, isPlayer, changecb) {
         if (isPlayer === void 0) { isPlayer = false; }
-        this.x = x;
-        this.y = y;
+        if (changecb === void 0) { changecb = undefined; }
+        _super.call(this);
         this.width = width;
         this.height = height;
         this.isPlayer = isPlayer;
+        this.changecb = changecb;
+        this.x = x;
+        this.y = y;
     }
     Box.prototype.vertices = function () {
         // don't judge me
@@ -58,7 +74,6 @@ var Box = (function () {
         var y = this.y;
         var width = this.width;
         var height = this.height;
-        //TODO - there's a better way
         if (this.isPlayer)
             return [];
         return [
@@ -105,12 +120,17 @@ var Box = (function () {
         context.fillStyle = 'lightgray';
         context.fill();
     };
+    __decorate([
+        prop
+    ], Box.prototype, "x");
+    __decorate([
+        prop
+    ], Box.prototype, "y");
     return Box;
-})();
+})(Ambrosia);
 function outOfBounds(v) {
     return v.x < 0 || v.x > 500 || v.y < 0 || v.y > 500;
 }
-// Does x almost equal y?
 function almost(x, y) {
     return Math.abs(x - y) < .0001;
 }
@@ -119,8 +139,6 @@ function isWithinRange(value, start, end) {
     var high = Math.max(start, end);
     return value >= low && value <= high;
 }
-// Raycast from start in the direction of secondPoint. If keepGoing, then continue past
-// that point, if possible. Stop if we collide with anything in colliders.
 function raycast(start, secondPoint, colliders, keepGoing) {
     if (keepGoing === void 0) { keepGoing = false; }
     if (start.eq(secondPoint)) {
@@ -151,7 +169,6 @@ function drawLine(context, start, end, color, dashed) {
     context.lineWidth = 1;
     context.beginPath();
     if (dashed) {
-        // Dashed lines don't work in IE<11?? All my hopes are dashed! (TODO)
         context.setLineDash([2, 3]);
     }
     else {
@@ -161,3 +178,4 @@ function drawLine(context, start, end, color, dashed) {
     context.lineTo(end.x, end.y);
     context.stroke();
 }
+//# sourceMappingURL=util.js.map
